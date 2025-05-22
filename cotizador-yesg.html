@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador - Yes G Cleaning Services LLC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header img {
+            height: 60px;
+            margin-right: 15px;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2a5caa;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #2a5caa;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #resultado,
+        #resumen {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #eef5ff;
+            border-left: 5px solid #2a5caa;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <img src="logo.jpeg" alt="Logo Yes G">
+        <h1>Yes G Cleaning Services LLC</h1>
+    </header>
+    <main>
+        <h2>Cotizador Personalizado</h2>
+
+        <label>Precio por pie² ($)</label>
+        <input type="number" id="precioPies" step="0.01">
+
+        <label>Precio por cuarto ($)</label>
+        <input type="number" id="precioCuarto">
+
+        <label>Precio por baño ($)</label>
+        <input type="number" id="precioBano">
+
+        <label>Porcentaje extra por limpieza profunda (%)</label>
+        <input type="number" id="porcentajeProfunda">
+
+        <label>Precio ventanas ($)</label>
+        <input type="number" id="extraVentanas">
+
+        <label>Precio refrigerador ($)</label>
+        <input type="number" id="extraRefrigerador">
+
+        <label>Precio horno ($)</label>
+        <input type="number" id="extraHorno">
+
+        <hr>
+
+        <label>Frecuencia</label>
+        <select id="frecuencia">
+            <option value="Primera vez">Primera vez</option>
+            <option value="Semanal">Semanal</option>
+            <option value="Cada 15 días">Cada 15 días</option>
+            <option value="Mensual">Mensual</option>
+        </select>
+
+        <label>Tipo de limpieza</label>
+        <select id="tipoLimpieza">
+            <option value="regular">Regular</option>
+            <option value="profunda">Profunda</option>
+        </select>
+
+        <label>Cuántos cuartos</label>
+        <input type="number" id="cuartos">
+
+        <label>Cuántos baños</label>
+        <input type="number" id="banos">
+
+        <label>Pies cuadrados</label>
+        <input type="number" id="pies">
+
+        <label>Servicios extra:</label>
+        <input type="checkbox" id="ventanas"> Ventanas<br>
+        <input type="checkbox" id="refrigerador"> Refrigerador<br>
+        <input type="checkbox" id="horno"> Horno<br>
+
+        <button onclick="calcular()">Calcular precio</button>
+
+        <div id="resultado"></div>
+        <div id="resumen"></div>
+    </main>
+
+    <script>
+        function calcular() {
+            let precioPies = parseFloat(document.getElementById("precioPies").value || 0);
+            let precioCuarto = parseFloat(document.getElementById("precioCuarto").value || 0);
+            let precioBano = parseFloat(document.getElementById("precioBano").value || 0);
+            let porcentajeProfunda = parseFloat(document.getElementById("porcentajeProfunda").value || 0);
+            let extraVentanas = parseFloat(document.getElementById("extraVentanas").value || 0);
+            let extraRefrigerador = parseFloat(document.getElementById("extraRefrigerador").value || 0);
+            let extraHorno = parseFloat(document.getElementById("extraHorno").value || 0);
+
+            let tipo = document.getElementById("tipoLimpieza").value;
+            let frecuencia = document.getElementById("frecuencia").value;
+            let cuartos = parseInt(document.getElementById("cuartos").value || 0);
+            let banos = parseInt(document.getElementById("banos").value || 0);
+            let pies = parseFloat(document.getElementById("pies").value || 0);
+
+            let total = (pies * precioPies) + (cuartos * precioCuarto) + (banos * precioBano);
+
+            if (tipo === "profunda") {
+                total += total * (porcentajeProfunda / 100);
+            }
+
+            let extras = [];
+            if (document.getElementById("ventanas").checked) {
+                total += extraVentanas;
+                extras.push("Ventanas");
+            }
+            if (document.getElementById("refrigerador").checked) {
+                total += extraRefrigerador;
+                extras.push("Refrigerador");
+            }
+            if (document.getElementById("horno").checked) {
+                total += extraHorno;
+                extras.push("Horno");
+            }
+
+            total = total.toFixed(2);
+
+            document.getElementById("resultado").innerHTML = "<strong>Total estimado: $</strong>" + total;
+            document.getElementById("resumen").innerHTML = `
+                <strong>Resumen:</strong><br>
+                Tipo de limpieza: ${tipo}<br>
+                Frecuencia: ${frecuencia}<br>
+                Cuartos: ${cuartos}, Baños: ${banos}, Pies²: ${pies}<br>
+                Extras: ${extras.join(", ") || "Ninguno"}<br>
+                <strong>Precio total: $${total}</strong>
+            `;
+        }
+    </script>
+</body>
+
+</html>
