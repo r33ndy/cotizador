@@ -4,192 +4,523 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cotizador - Yes G Cleaning Services LLC</title>
+    <title>Cotizador de Limpieza</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f7f7f7;
-            color: #333;
+            font-family: 'Inter', sans-serif;
         }
 
-        header {
-            display: flex;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        /* Estilo para cuando un servicio adicional (checkbox o radio) está seleccionado */
+        .service-option:checked+label div {
+            transform: scale(1.03);
+            box-shadow: 0 0 0 2px #2563eb;
+            /* Tailwind blue-600 */
+            border-color: #2563eb;
+            background-color: #eff6ff;
+            /* Tailwind blue-50 */
+            color: #1e3a8a;
+            /* Tailwind blue-800 */
         }
 
-        header img {
-            height: 60px;
-            margin-right: 15px;
+        .service-option:checked+label div p {
+            color: #1d4ed8;
+            /* Tailwind blue-700 */
         }
 
-        main {
-            max-width: 800px;
-            margin: 20px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        /* Estilo para cuando una frecuencia está seleccionada */
+        .frequency-radio:checked+label div {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px #3b82f6;
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            color: #1e3a8a;
         }
 
-        h2 {
-            text-align: center;
-            color: #2a5caa;
+        .error-message {
+            color: red;
+            font-size: 0.875rem;
+            /* text-sm */
+            margin-top: 0.25rem;
+            /* mt-1 */
         }
 
-        label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
+        .service-group-title {
+            font-size: 0.875rem;
+            /* text-sm */
+            font-weight: 500;
+            /* medium */
+            color: #374151;
+            /* slate-700 */
+            margin-bottom: 0.5rem;
+            /* mb-2 */
+            margin-top: 0.75rem;
+            /* mt-3 */
         }
 
-        input,
-        select {
+        .service-sub-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.5rem;
+            /* gap-2 */
+            padding-left: 0.5rem;
+            /* pl-2 */
+        }
+
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
             width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
         }
 
-        button {
-            margin-top: 20px;
-            padding: 12px;
-            background-color: #2a5caa;
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .modal-close-button {
+            background-color: #3b82f6;
             color: white;
+            padding: 10px 20px;
             border: none;
-            border-radius: 6px;
-            font-size: 16px;
+            border-radius: 0.375rem;
             cursor: pointer;
+            margin-top: 1rem;
         }
 
-        #resultado,
-        #resumen {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #eef5ff;
-            border-left: 5px solid #2a5caa;
+        .modal-close-button:hover {
+            background-color: #2563eb;
         }
     </style>
 </head>
 
-<body>
-    <header>
-        <img src="logo.jpeg" alt="Logo Yes G">
-        <h1>Yes G Cleaning Services LLC</h1>
-    </header>
-    <main>
-        <h2>Cotizador Personalizado</h2>
+<body
+    class="bg-gradient-to-br from-slate-100 to-sky-100 min-h-screen flex flex-col items-center justify-center p-4 selection:bg-blue-500 selection:text-white">
 
-        <label>Precio por pie² ($)</label>
-        <input type="number" id="precioPies" step="0.01">
+    <div class="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-2xl w-full max-w-2xl">
+        <header class="mb-6 text-center">
+            <img src="logo.JPG" alt="Logo de la Empresa" class="mx-auto mb-4 h-12 sm:h-16 w-auto rounded">
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-800">Cotizador de Servicios de Limpieza</h1>
+            <p class="text-slate-600 mt-2">Obtén una estimación rápida para la limpieza de tu espacio.</p>
+        </header>
 
-        <label>Precio por cuarto ($)</label>
-        <input type="number" id="precioCuarto">
+        <form id="cleaningForm" class="space-y-6">
+            <div>
+                <label for="cleaningType" class="block text-sm font-medium text-slate-700 mb-1">Tipo de Limpieza
+                    Principal</label>
+                <select id="cleaningType" name="cleaningType"
+                    class="mt-1 block w-full py-2 px-3 border border-slate-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <option value="regular">Regular</option>
+                    <option value="profunda">Profunda</option>
+                </select>
+                <p id="cleaningTypeError" class="error-message hidden">Por favor, selecciona un tipo de limpieza.</p>
+            </div>
 
-        <label>Precio por baño ($)</label>
-        <input type="number" id="precioBano">
+            <div>
+                <label for="roomBathCombo" class="block text-sm font-medium text-slate-700 mb-1">Configuración de
+                    Espacio</label>
+                <select id="roomBathCombo" name="roomBathCombo"
+                    class="mt-1 block w-full py-2 px-3 border border-slate-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <option value="">Selecciona una configuración...</option>
+                </select>
+                <p id="roomBathComboError" class="error-message hidden">Por favor, selecciona una configuración de
+                    espacio.</p>
+            </div>
 
-        <label>Porcentaje extra por limpieza profunda (%)</label>
-        <input type="number" id="porcentajeProfunda">
+            <div>
+                <h3 class="text-sm font-medium text-slate-700 mb-2">Frecuencia del Servicio</h3>
+                <div id="frequencyOptions" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div>
+                        <input type="radio" name="frequency" id="oneTime" value="oneTime"
+                            class="hidden frequency-radio service-option" checked>
+                        <label for="oneTime" class="block cursor-pointer">
+                            <div
+                                class="p-4 border border-slate-300 rounded-lg text-center hover:bg-slate-100 transition-all duration-200">
+                                Única Vez</div>
+                        </label>
+                    </div>
+                    <div>
+                        <input type="radio" name="frequency" id="weekly" value="weekly"
+                            class="hidden frequency-radio service-option">
+                        <label for="weekly" class="block cursor-pointer">
+                            <div
+                                class="p-4 border border-slate-300 rounded-lg text-center hover:bg-slate-100 transition-all duration-200">
+                                Semanal</div>
+                        </label>
+                    </div>
+                    <div>
+                        <input type="radio" name="frequency" id="biWeekly" value="biWeekly"
+                            class="hidden frequency-radio service-option">
+                        <label for="biWeekly" class="block cursor-pointer">
+                            <div
+                                class="p-4 border border-slate-300 rounded-lg text-center hover:bg-slate-100 transition-all duration-200">
+                                Quincenal</div>
+                        </label>
+                    </div>
+                    <div>
+                        <input type="radio" name="frequency" id="monthly" value="monthly"
+                            class="hidden frequency-radio service-option">
+                        <label for="monthly" class="block cursor-pointer">
+                            <div
+                                class="p-4 border border-slate-300 rounded-lg text-center hover:bg-slate-100 transition-all duration-200">
+                                Mensual</div>
+                        </label>
+                    </div>
+                </div>
+                <p id="frequencyError" class="error-message hidden">Por favor, selecciona una frecuencia.</p>
+            </div>
 
-        <label>Precio ventanas ($)</label>
-        <input type="number" id="extraVentanas">
+            <div>
+                <h3 class="text-sm font-medium text-slate-700 mb-2">Servicios Adicionales</h3>
+                <div id="extraServicesContainer" class="space-y-4">
 
-        <label>Precio refrigerador ($)</label>
-        <input type="number" id="extraRefrigerador">
+                    <div class="relative flex items-start">
+                        <input id="windows" name="extraServicesCheck" type="checkbox" value="windows"
+                            class="hidden service-option">
+                        <label for="windows" class="ml-3 text-sm w-full cursor-pointer">
+                            <div
+                                class="p-4 border border-slate-300 rounded-lg hover:bg-slate-100 transition-all duration-200">
+                                <span class="font-medium text-slate-800">Limpieza de Ventanas ($40)</span>
+                                <p class="text-slate-500 text-xs">Interior y exterior accesible.</p>
+                            </div>
+                        </label>
+                    </div>
 
-        <label>Precio horno ($)</label>
-        <input type="number" id="extraHorno">
+                    <div>
+                        <h4 class="service-group-title">Limpieza de Horno:</h4>
+                        <div class="service-sub-options">
+                            <div>
+                                <input type="radio" name="oven_service" id="oven_none" value="oven_none"
+                                    class="hidden service-option" checked>
+                                <label for="oven_none" class="block cursor-pointer">
+                                    <div
+                                        class="p-3 border border-slate-300 rounded-lg text-center hover:bg-slate-100 transition-all duration-200 text-xs">
+                                        Ninguno</div>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="oven_service" id="oven_regular" value="oven_regular"
+                                    class="hidden service-option">
+                                <label for="oven_regular" class="block cursor-pointer">
+                                    <div
+                                        class="p-3 border border-slate-300 rounded-lg text-center hover:bg-slate-100 transition-all duration-200 text-xs">
+                                        Regular ($30)</div>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="oven_service" id="oven_profundo" value="oven_profundo"
+                                    class="hidden service-option">
+                                <label for="oven_profundo" class="block cursor-pointer">
+                                    <div
+                                        class="p-3 border border-slate-300 rounded-lg text-center hover:bg-slate-100 transition-all duration-200 text-xs">
+                                        Profundo ($60)</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
 
-        <hr>
+                    <div>
+                        <h4 class="service-group-title">Limpieza de Refrigerador:</h4>
+                        <div class="service-sub-options">
+                            <div>
+                                <input type="radio" name="fridge_service" id="fridge_none" value="fridge_none"
+                                    class="hidden service-option" checked>
+                                <label for="fridge_none" class="block cursor-pointer">
+                                    <div
+                                        class="p-3 border border-slate-300 rounded-lg text-center hover:bg-slate-100 transition-all duration-200 text-xs">
+                                        Ninguno</div>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="fridge_service" id="fridge_regular" value="fridge_regular"
+                                    class="hidden service-option">
+                                <label for="fridge_regular" class="block cursor-pointer">
+                                    <div
+                                        class="p-3 border border-slate-300 rounded-lg text-center hover:bg-slate-100 transition-all duration-200 text-xs">
+                                        Regular ($20)</div>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="radio" name="fridge_service" id="fridge_profundo" value="fridge_profundo"
+                                    class="hidden service-option">
+                                <label for="fridge_profundo" class="block cursor-pointer">
+                                    <div
+                                        class="p-3 border border-slate-300 rounded-lg text-center hover:bg-slate-100 transition-all duration-200 text-xs">
+                                        Profundo ($50)</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
 
-        <label>Frecuencia</label>
-        <select id="frecuencia">
-            <option value="Primera vez">Primera vez</option>
-            <option value="Semanal">Semanal</option>
-            <option value="Cada 15 días">Cada 15 días</option>
-            <option value="Mensual">Mensual</option>
-        </select>
+                    <div class="relative flex items-start pt-2">
+                        <input id="laundry" name="extraServicesCheck" type="checkbox" value="laundry"
+                            class="hidden service-option">
+                        <label for="laundry" class="ml-3 text-sm w-full cursor-pointer">
+                            <div
+                                class="p-4 border border-slate-300 rounded-lg hover:bg-slate-100 transition-all duration-200">
+                                <span class="font-medium text-slate-800">Lavandería ($18)</span>
+                                <p class="text-slate-500 text-xs">Lavado y secado (1 carga).</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
 
-        <label>Tipo de limpieza</label>
-        <select id="tipoLimpieza">
-            <option value="regular">Regular</option>
-            <option value="profunda">Profunda</option>
-        </select>
+            <div class="pt-2">
+                <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all duration-200 ease-in-out">
+                    Calcular Cotización
+                </button>
+            </div>
+        </form>
 
-        <label>Cuántos cuartos</label>
-        <input type="number" id="cuartos">
+        <div id="quoteResult" class="mt-10 p-6 bg-slate-50 rounded-lg shadow hidden">
+            <h2 class="text-2xl font-semibold text-slate-800 mb-4">Tu Cotización Estimada</h2>
+            <div class="text-4xl font-bold text-blue-600 mb-2">
+                $<span id="totalPrice">0.00</span> USD
+            </div>
+            <p id="quoteDetails" class="text-slate-600 text-sm">Esta es una estimación. El precio final puede variar.
+            </p>
+            <button id="contactButton"
+                class="mt-6 w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition-colors duration-150">
+                Contactar para Confirmar
+            </button>
+        </div>
+    </div>
 
-        <label>Cuántos baños</label>
-        <input type="number" id="banos">
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle" class="text-xl font-semibold text-slate-800 mb-3">Información</h3>
+            <p id="modalMessage" class="text-slate-600"></p>
+            <button id="modalClose" class="modal-close-button">Entendido</button>
+        </div>
+    </div>
 
-        <label>Pies cuadrados</label>
-        <input type="number" id="pies">
-
-        <label>Servicios extra:</label>
-        <input type="checkbox" id="ventanas"> Ventanas<br>
-        <input type="checkbox" id="refrigerador"> Refrigerador<br>
-        <input type="checkbox" id="horno"> Horno<br>
-
-        <button onclick="calcular()">Calcular precio</button>
-
-        <div id="resultado"></div>
-        <div id="resumen"></div>
-    </main>
+    <footer class="text-center mt-12 mb-6">
+        <p class="text-sm text-slate-500">&copy; <span id="currentYear"></span> Yes'g Cleaning Services LLC. Todos los
+            derechos reservados.</p>
+    </footer>
 
     <script>
-        function calcular() {
-            let precioPies = parseFloat(document.getElementById("precioPies").value || 0);
-            let precioCuarto = parseFloat(document.getElementById("precioCuarto").value || 0);
-            let precioBano = parseFloat(document.getElementById("precioBano").value || 0);
-            let porcentajeProfunda = parseFloat(document.getElementById("porcentajeProfunda").value || 0);
-            let extraVentanas = parseFloat(document.getElementById("extraVentanas").value || 0);
-            let extraRefrigerador = parseFloat(document.getElementById("extraRefrigerador").value || 0);
-            let extraHorno = parseFloat(document.getElementById("extraHorno").value || 0);
+        // --- Modal Logic ---
+        const infoModal = document.getElementById('infoModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseButton = document.getElementById('modalClose');
 
-            let tipo = document.getElementById("tipoLimpieza").value;
-            let frecuencia = document.getElementById("frecuencia").value;
-            let cuartos = parseInt(document.getElementById("cuartos").value || 0);
-            let banos = parseInt(document.getElementById("banos").value || 0);
-            let pies = parseFloat(document.getElementById("pies").value || 0);
-
-            let total = (pies * precioPies) + (cuartos * precioCuarto) + (banos * precioBano);
-
-            if (tipo === "profunda") {
-                total += total * (porcentajeProfunda / 100);
-            }
-
-            let extras = [];
-            if (document.getElementById("ventanas").checked) {
-                total += extraVentanas;
-                extras.push("Ventanas");
-            }
-            if (document.getElementById("refrigerador").checked) {
-                total += extraRefrigerador;
-                extras.push("Refrigerador");
-            }
-            if (document.getElementById("horno").checked) {
-                total += extraHorno;
-                extras.push("Horno");
-            }
-
-            total = total.toFixed(2);
-
-            document.getElementById("resultado").innerHTML = "<strong>Total estimado: $</strong>" + total;
-            document.getElementById("resumen").innerHTML = `
-                <strong>Resumen:</strong><br>
-                Tipo de limpieza: ${tipo}<br>
-                Frecuencia: ${frecuencia}<br>
-                Cuartos: ${cuartos}, Baños: ${banos}, Pies²: ${pies}<br>
-                Extras: ${extras.join(", ") || "Ninguno"}<br>
-                <strong>Precio total: $${total}</strong>
-            `;
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            infoModal.style.display = 'block';
         }
+
+        modalCloseButton.onclick = function () {
+            infoModal.style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            if (event.target == infoModal) {
+                infoModal.style.display = 'none';
+            }
+        }
+
+        // --- Pricing Configuration ---
+        const pricingTable = [
+            { rooms: 1, bathrooms: 1, regular: 100, profunda: 200 },
+            { rooms: 2, bathrooms: 1, regular: 120, profunda: 200 },
+            { rooms: 2, bathrooms: 1.5, regular: 130, profunda: 200 },
+            { rooms: 3, bathrooms: 2.5, regular: 150, profunda: 250 },
+            { rooms: 4, bathrooms: 2.5, regular: 200, profunda: 350 },
+            { rooms: 5, bathrooms: 3.5, regular: 300, profunda: 450 },
+            { rooms: 6, bathrooms: 3.5, regular: 350, profunda: 600 },
+            { rooms: 7, bathrooms: 4.5, regular: 450, profunda: 700 },
+        ];
+
+        const frequencyMultipliers = {
+            oneTime: 1,
+            weekly: 0.9,
+            biWeekly: 0.95,
+            monthly: 0.98,
+        };
+
+        // Updated extra service prices
+        const extraServicePrices = {
+            windows: 40,
+            oven_regular: 30,
+            oven_profundo: 60,
+            fridge_regular: 20,
+            fridge_profundo: 50,
+            laundry: 18, // Remains the same
+            // 'none' options will have a value but no price associated or handled as 0
+        };
+
+        // --- Populate Room/Bath Combo Dropdown ---
+        const roomBathComboSelect = document.getElementById('roomBathCombo');
+
+        function populateRoomBathCombo() {
+            const uniqueCombinations = new Map();
+            pricingTable.forEach(entry => {
+                const key = `${entry.rooms}-${entry.bathrooms}`;
+                if (!uniqueCombinations.has(key)) {
+                    uniqueCombinations.set(key, entry);
+                }
+            });
+
+            const sortedCombinations = Array.from(uniqueCombinations.values()).sort((a, b) => {
+                if (a.rooms === b.rooms) {
+                    return a.bathrooms - b.bathrooms;
+                }
+                return a.rooms - b.rooms;
+            });
+
+            sortedCombinations.forEach(entry => {
+                const option = document.createElement('option');
+                option.value = `${entry.rooms}-${entry.bathrooms}`;
+                const bathText = Number.isInteger(entry.bathrooms) ? entry.bathrooms : entry.bathrooms.toFixed(1);
+                option.textContent = `${entry.rooms} Habitación(es), ${bathText} Baño(s)`;
+                roomBathComboSelect.appendChild(option);
+            });
+        }
+
+        // --- Form Validation and Error Display ---
+        function validateForm(formData) {
+            let isValid = true;
+            const toggleError = (elementId, showError, message = "") => {
+                const errorEl = document.getElementById(elementId);
+                if (showError) {
+                    errorEl.textContent = message;
+                    errorEl.classList.remove('hidden');
+                } else {
+                    errorEl.classList.add('hidden');
+                }
+            };
+
+            if (!formData.get('cleaningType')) {
+                toggleError('cleaningTypeError', true, 'Por favor, selecciona un tipo de limpieza.');
+                isValid = false;
+            } else {
+                toggleError('cleaningTypeError', false);
+            }
+
+            if (!formData.get('roomBathCombo')) {
+                toggleError('roomBathComboError', true, 'Por favor, selecciona una configuración de espacio.');
+                isValid = false;
+            } else {
+                toggleError('roomBathComboError', false);
+            }
+
+            const frequency = formData.get('frequency');
+            if (!frequency) {
+                toggleError('frequencyError', true, 'Por favor, selecciona una frecuencia.');
+                isValid = false;
+            } else {
+                toggleError('frequencyError', false);
+            }
+            return isValid;
+        }
+
+        // --- Form Submission and Calculation Logic ---
+        const form = document.getElementById('cleaningForm');
+        const quoteResultDiv = document.getElementById('quoteResult');
+        const totalPriceSpan = document.getElementById('totalPrice');
+        const quoteDetailsP = document.getElementById('quoteDetails');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData(form);
+
+            if (!validateForm(formData)) {
+                showModal("Error de Validación", "Por favor, corrige los campos marcados en rojo.");
+                quoteResultDiv.classList.add('hidden');
+                return;
+            }
+
+            let basePrice = 0;
+            let total = 0;
+            let customQuoteMessage = "";
+
+            const cleaningType = formData.get('cleaningType');
+            const roomBathValue = formData.get('roomBathCombo');
+
+            let bedrooms = 0;
+            let bathrooms = 0;
+
+            if (roomBathValue) {
+                const parts = roomBathValue.split('-');
+                bedrooms = parseInt(parts[0]) || 0;
+                bathrooms = parseFloat(parts[1]) || 0;
+            }
+
+            const priceEntry = pricingTable.find(p => p.rooms === bedrooms && p.bathrooms === bathrooms);
+
+            if (priceEntry) {
+                basePrice = (cleaningType === 'regular') ? priceEntry.regular : priceEntry.profunda;
+                customQuoteMessage = "Esta es una estimación. El precio final puede variar.";
+            } else {
+                basePrice = 0;
+                customQuoteMessage = "Configuración no encontrada. Por favor contáctanos.";
+            }
+
+            total = basePrice;
+
+            const frequency = formData.get('frequency');
+            total *= frequencyMultipliers[frequency] || 1;
+
+            // Calculate extra services
+            // Checkboxes
+            const selectedCheckboxes = formData.getAll('extraServicesCheck'); // Changed name for checkboxes
+            selectedCheckboxes.forEach(serviceValue => {
+                total += extraServicePrices[serviceValue] || 0;
+            });
+
+            // Radio buttons for Oven
+            const ovenService = formData.get('oven_service');
+            if (ovenService && ovenService !== 'oven_none') {
+                total += extraServicePrices[ovenService] || 0;
+            }
+
+            // Radio buttons for Fridge
+            const fridgeService = formData.get('fridge_service');
+            if (fridgeService && fridgeService !== 'fridge_none') {
+                total += extraServicePrices[fridgeService] || 0;
+            }
+
+            totalPriceSpan.textContent = total.toFixed(2);
+            quoteDetailsP.textContent = customQuoteMessage;
+            quoteResultDiv.classList.remove('hidden');
+
+            if (window.innerWidth < 768) {
+                quoteResultDiv.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // --- Contact Button ---
+        const contactButton = document.getElementById('contactButton');
+        contactButton.addEventListener('click', function () {
+            showModal("Contactar", "Para confirmar tu cotización y agendar el servicio, por favor contáctanos al: \n\nEmail: yes.guzman1985@gmail.com \nTeléfono: +1 (443) 627-1344 \n\n¡Gracias!");
+        });
+
+        // --- Update current year in footer ---
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // --- Initial DOMContentLoaded setup ---
+        document.addEventListener('DOMContentLoaded', () => {
+            populateRoomBathCombo();
+        });
     </script>
 </body>
 
